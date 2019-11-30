@@ -1,0 +1,35 @@
+const dbModel = require('../../models');
+class EmployeeDbServices {
+    static async CreateEMP(payLoad: any) {
+        try {
+            return dbModel.employees.create(payLoad);
+        } catch (error) {
+            throw error;
+        }
+    }
+    static async schoolEmpDetails(payLoad: any) {
+        try {
+            return dbModel.employees.findAll({
+                where: {
+                    email: payLoad.email,
+                    password: payLoad.password
+                }
+            });
+        } catch (error) {
+            throw error;
+        }
+    }
+    static async listEmployees(payLoad: any) {
+        try {
+            return dbModel.employees.findAll({
+                attribute: ['employee_name', 'email', 'id', 'phone_number'],
+                where: {
+                    school_id: payLoad
+                }
+            })
+        } catch (error) {
+            throw error;
+        }
+    }
+}
+export default EmployeeDbServices;

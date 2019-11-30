@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import schoolDbService from '../services/schoolDbServices'
 import { ILoginData } from "../_interfaces/login.model";
+import EmployeeDbServices from "../services/emp.db.services";
 class SchoolController {
     static AddSchool = (req: Request, res: Response) => {
         if (req.body.school_name && req.body.email && req.body.password && req.body.user_name &&
@@ -39,6 +40,15 @@ class SchoolController {
                 }).catch(e => { res.status(403).send('User not exists') })
         } else {
             res.status(500).send('Required parameters are missing');
+        }
+    }
+    static getEmployees = (req: Request, res: Response) => {
+        console.log(req.params.school_id)
+        if (req.params.school_id) {
+            EmployeeDbServices.listEmployees(req.params.school_id)
+                .then(data => {
+                    res.status(200).send({ list: data })
+                }).catch(e => res.status(500).send('something went wrong'))
         }
     }
 }
