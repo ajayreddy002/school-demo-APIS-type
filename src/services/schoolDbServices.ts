@@ -13,7 +13,8 @@ class SchoolDbServices {
                 where:{
                     email: payLoad.email,
                     password: payLoad.password
-                }
+                },
+                attributes: ['id', 'school_name', 'user_name', 'email', 'school_address', 'phone_number']
             });
         } catch(error){
             throw error;

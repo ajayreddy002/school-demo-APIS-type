@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import schoolDbService from '../services/schoolDbServices'
-import { ILoginData } from "../_interfaces/login.model";
 import EmployeeDbServices from "../services/emp.db.services";
+import * as jwt from "jsonwebtoken";
+require('dotenv').config();
 class SchoolController {
     static AddSchool = (req: Request, res: Response) => {
         if (req.body.school_name && req.body.email && req.body.password && req.body.user_name &&
@@ -24,20 +25,17 @@ class SchoolController {
             schoolDbService.schoolAdminLogin(req.body)
                 .then((data) => {
                     if (data.length > 0) {
-                        delete data[0].password;
-                        let adminDetails: ILoginData = {
-                            id: data[0].id,
-                            school_name: data[0].school_name,
-                            email: data[0].email,
-                            user_name: data[0].user_name,
-                            phone_number: data[0].phone_number,
-                            school_address: data[0].school_address,
-                        };
-                        res.status(200).send({ userDetails: [adminDetails] })
+                        const secret = process.env.secret;
+                        console.log(secret)
+                        const payload = { email: data[0].email, school_name: data[0].school_name, user_name: data[0].user_name };
+                        // const iat = Math.floor(Date.now() / 1000) - 30;
+                        const options = { expiresIn: '1h' };
+                        const token = jwt.sign(payload, JSON.stringify(secret), options);
+                        res.status(200).send({ userDetails: data, toke: token })
                     } else {
                         res.status(403).send('User not exists')
                     }
-                }).catch(e => { res.status(403).send('User not exists') })
+                }).catch(e => { console.log(e), res.status(403).send('User not exists') })
         } else {
             res.status(500).send('Required parameters are missing');
         }
@@ -47,7 +45,7 @@ class SchoolController {
         if (req.params.school_id) {
             EmployeeDbServices.listEmployees(req.params.school_id)
                 .then(data => {
-                    res.status(200).send({ list: data })
+                    res.status(200).send({ staffList: data })
                 }).catch(e => res.status(500).send('something went wrong'))
         }
     }

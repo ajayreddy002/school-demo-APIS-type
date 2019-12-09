@@ -10,7 +10,7 @@ class EmployeeController {
                     if (data.id) {
                         res.status(200).send('Employee added');
                     } else {
-                        res.status(500).send('Something went wrong')
+                        res.status(500).send('Employee already registered please check')
                     }
                 }).catch(e => res.status(500).send('Something went wrong'));
         }

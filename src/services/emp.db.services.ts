@@ -22,10 +22,10 @@ class EmployeeDbServices {
     static async listEmployees(payLoad: any) {
         try {
             return dbModel.employees.findAll({
-                attribute: ['employee_name', 'email', 'id', 'phone_number'],
                 where: {
                     school_id: payLoad
-                }
+                },
+                attributes: ['id', 'employee_name', 'email', 'phone_number'],
             })
         } catch (error) {
             throw error;
