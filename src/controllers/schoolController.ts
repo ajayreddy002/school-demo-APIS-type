@@ -27,11 +27,11 @@ class SchoolController {
                     if (data.length > 0) {
                         const secret = process.env.secret;
                         console.log(secret)
-                        const payload = { email: data[0].email, school_name: data[0].school_name, user_name: data[0].user_name };
+                        const payload = { email: data[0].email, school_name: data[0].school_name, user_name: data[0].user_name, id: data[0].id };
                         // const iat = Math.floor(Date.now() / 1000) - 30;
                         const options = { expiresIn: '1h' };
                         const token = jwt.sign(payload, JSON.stringify(secret), options);
-                        res.status(200).send({ userDetails: data, toke: token })
+                        res.status(200).send({ userDetails: data, token: token })
                     } else {
                         res.status(403).send('User not exists')
                     }
@@ -43,7 +43,9 @@ class SchoolController {
     static getEmployees = (req: Request, res: Response) => {
         console.log(req.params.school_id)
         if (req.params.school_id) {
-            EmployeeDbServices.listEmployees(req.params.school_id)
+            const token = req.headers.authorization || '';
+            const decodeToken: any = jwt.verify(token, JSON.stringify(process.env.secret));
+            EmployeeDbServices.listEmployees(decodeToken.id)
                 .then(data => {
                     res.status(200).send({ staffList: data })
                 }).catch(e => res.status(500).send('something went wrong'))
