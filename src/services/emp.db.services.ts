@@ -25,7 +25,7 @@ class EmployeeDbServices {
                 where: {
                     school_id: payLoad
                 },
-                attributes: ['id', 'employee_name', 'email', 'phone_number'],
+                attributes: ['id', 'employee_name', 'email', 'phone_number', 'subject'],
             })
         } catch (error) {
             throw error;
