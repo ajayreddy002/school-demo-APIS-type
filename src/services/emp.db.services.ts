@@ -31,5 +31,17 @@ class EmployeeDbServices {
             throw error;
         }
     }
+    static async updateEmpDetails(payLoad: any) {
+        try {
+            return dbModel.employees.update({
+                where: {
+                    id: payLoad.employee_id,
+                    school_id: payLoad.school_id
+                }
+            });
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 export default EmployeeDbServices;

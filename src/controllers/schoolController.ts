@@ -2,20 +2,40 @@ import { Request, Response } from "express";
 import schoolDbService from '../services/schoolDbServices'
 import EmployeeDbServices from "../services/emp.db.services";
 import * as jwt from "jsonwebtoken";
+import bcrypt from 'bcrypt';
+import LoginTableService from "../services/login.db.service";
+const saltRounds = 10;
 require('dotenv').config();
 class SchoolController {
     static AddSchool = (req: Request, res: Response) => {
         if (req.body.school_name && req.body.email && req.body.password && req.body.user_name &&
             req.body.school_address && req.body.phone_number) {
-            schoolDbService.CreateSchool(req.body)
-                .then(data => {
-                    if (data.id) {
-                        res.status(200).send('School registered successfully');
-                    }
-                }).catch(error => {
-                    console.log(error, 'error')
-                    res.status(500).send('Email already registered');
-                })
+            bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
+                if (hash) {
+                    req.body.password = hash;
+                    schoolDbService.CreateSchool(req.body)
+                        .then(data => {
+                            if (data.id) {
+                                const logiData = {
+                                    email: req.body.email,
+                                    password: hash
+                                }
+                                LoginTableService.CreateLogin(logiData)
+                                    .then((success: any) => {
+                                        res.status(200).send('School registered successfully');
+                                    }).catch(e => {
+                                        console.log(e, 'error')
+                                        res.status(500).send('Email already registered');
+                                    })
+                            }
+                        }).catch(error => {
+                            console.log(error, 'error')
+                            res.status(500).send('Email already registered');
+                        })
+                } else {
+                    res.status(500).send('Something went wrong');
+                }
+            });
         } else {
             res.status(500).send('Required parameters are missing');
         }
