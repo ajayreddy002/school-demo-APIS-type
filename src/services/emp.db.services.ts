@@ -33,9 +33,21 @@ class EmployeeDbServices {
     }
     static async updateEmpDetails(payLoad: any) {
         try {
-            return dbModel.employees.update({
+            return dbModel.employees.update(payLoad, {
                 where: {
-                    id: payLoad.employee_id,
+                    id: payLoad.id,
+                    school_id: payLoad.school_id
+                }
+            });
+        } catch (error) {
+            throw error;
+        }
+    }
+    static async deleteEmpDetails(payLoad: any) {
+        try {
+            return dbModel.employees.destroy({
+                where: {
+                    id: payLoad.id,
                     school_id: payLoad.school_id
                 }
             });

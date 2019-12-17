@@ -45,12 +45,19 @@ class SchoolController {
             schoolDbService.schoolAdminLogin(req.body)
                 .then((data) => {
                     if (data.length > 0) {
-                        const secret = process.env.secret;
-                        const payload = { email: data[0].email, school_name: data[0].school_name, user_name: data[0].user_name, id: data[0].id };
-                        // const iat = Math.floor(Date.now() / 1000) - 30;
-                        const options = { expiresIn: '3h' };
-                        const token = jwt.sign(payload, JSON.stringify(secret), options);
-                        res.status(200).send({ userDetails: data, token: token })
+                        bcrypt.compare(req.body.password, data[0].password, (err, suces) => {
+                            if (suces) {
+                                delete data[0].password;
+                                const secret = process.env.secret;
+                                const payload = { email: data[0].email, school_name: data[0].school_name, user_name: data[0].user_name, id: data[0].id };
+                                // const iat = Math.floor(Date.now() / 1000) - 30;
+                                const options = { expiresIn: '3h' };
+                                const token = jwt.sign(payload, JSON.stringify(secret), options);
+                                res.status(200).send({ userDetails: data, token: token })
+                            } else {
+                                res.status(403).send('Email or password incorrect')
+                            }
+                        })
                     } else {
                         res.status(403).send('User not exists')
                     }

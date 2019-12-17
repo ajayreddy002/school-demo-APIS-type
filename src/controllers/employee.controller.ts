@@ -21,16 +21,48 @@ class EmployeeController {
         }
     }
     static updateEmployee = (req: Request, res: Response) => {
-        if (req.body.employee_id && req.body.email && req.body.password) {
+        if (req.body.id && req.body.email && req.body.employee_name
+            && req.body.phone_number) {
+            console.log(req.body.id)
             const token = req.headers.authorization || '';
             const decodeToken: any = jwt.verify(token, JSON.stringify(process.env.secret));
             req.body.school_id = decodeToken.id;
             empDbServices.updateEmpDetails(req.body)
                 .then(data => {
-                    if (data.id) {
+                    if (data) {
                         res.status(200).send('Employee details updated');
+                    } else {
+                        res.status(500).send('Failed to update')
                     }
+                }).catch(e => { console.log(e), res.status(500).send('Something went wrong') });
+        } else {
+            res.status(500).send('Required parameters are missing');
+        }
+    }
+    static deleteEmployee = (req: Request, res: Response) => {
+        if (req.params.employee_id) {
+            console.log(req.params.employee_id)
+            const token = req.headers.authorization || '';
+            const decodeToken: any = jwt.verify(token, JSON.stringify(process.env.secret));
+            const payLoad = {
+                school_id: decodeToken.id,
+                id: req.params.employee_id
+            }
+            empDbServices.deleteEmpDetails(payLoad)
+                .then(
+                    data => {
+                        if (data) {
+                            res.status(200).send('Employee deleted');
+                        } else {
+                            res.status(500).send('Failed to delete')
+                        }
+                    }
+                ).catch(e => {
+                    console.log(e)
+                    res.status(500).send('Something went wrong')
                 })
+        } else {
+            res.status(500).send('Required parameters are missing');
         }
     }
 }
